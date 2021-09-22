@@ -1,0 +1,58 @@
+---
+- name:  0 print boxname and IP
+  debug:
+    msg: 'Starting to run playbook in ckanbox at 192.168.100.101'
+    
+- name: 1 Install aptitude
+  package:
+    name: aptitude
+    state: present
+
+- name: 2 Update and upgrade apt packages
+  apt:
+    upgrade: 'True'
+    update_cache: 'True'
+    cache_valid_time: 86400 #One day
+
+- name: 3 Install apt packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3-pip
+    - python3-setuptools
+    - python3-dev
+    - zip
+    - wget
+    - git
+    - vim
+    - nginx
+    - nginx-extras
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+    - tmux
+    - lynx
+    - libpq5
+    - libpq-dev
+    - redis-server
+    - solr-tomcat
+    - default-jdk
+    - postgresql
+    - postfix
+
+- name: 4 which pip3 executable
+  command: which pip3
+  register: pip3_path
+
+# - name: 5 Install Python libraries
+#   pip:
+#     name: "{{ item }}"
+#     executable: "{{ pip3_path.stdout }}"
+#     extra_args: --upgrade
+#   loop:
+#     - setuptools==44.1.0
+#     - pip
+#     - virtualenv

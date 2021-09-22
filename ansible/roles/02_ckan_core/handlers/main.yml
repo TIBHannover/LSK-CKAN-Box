@@ -1,0 +1,17 @@
+---
+- name: restart_postgres
+  service:
+    name: postgresql
+    state: reloaded
+    
+- name: restart_supervisor
+  service:
+    name: supervisor
+    state: reloaded
+
+- name: ckan_tmp_dir_writable
+  file:
+    path: '/tmp/{{ ckan_site_id }}'
+    mode: 'a+rw'
+    recurse: yes
+    state: directory

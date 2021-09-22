@@ -1,0 +1,28 @@
+all:
+  vars: 
+    boxname: "ckanbox"   # placeholder
+  children:
+    Vagrant: # group
+      hosts:  
+        ckanbox:  # host
+          # vars for specific host
+          ansible_ssh_host: 127.0.0.1
+          ansible_port: 2222
+      vars: # apply to all hosts within group
+        ansible_connection: 'local'
+        ansible_ssh_user: 'vagrant'
+        ansible_sudo_password: 'vagrant'
+        ansible_ssh_private_key_file: '~/.vagrant.d/insecure_private_key'
+        ansible_python_interpreter: '/usr/bin/python3'
+        vm_url: '192.168.100.101'
+        # CKAN VARS
+        ckan_site_id: 'default'
+        ckan_app_dir: '/usr/lib/ckan/{{ ckan_site_id }}'
+        ckan_config_dir: '/etc/ckan/{{ ckan_site_id }}'
+        ckan_log_dir: '/var/log/ckan'
+        ckan_db: 'ckan'
+        ckan_db_user: 'ckan_db_user'  # overwrite in deployment
+        ckan_db_pwd: 'ckandbpassword'  # overwrite in deployment
+        datastore_db: 'datastore_db'
+        datastore_db_user: 'datastore_db_user'  # overwrite in deployment
+

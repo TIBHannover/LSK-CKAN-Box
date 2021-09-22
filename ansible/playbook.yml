@@ -1,0 +1,9 @@
+- hosts: all
+  become: yes
+  roles:
+    - role: 01_utils
+      tags:
+        - utils
+    - role: 02_ckan_core
+      tags:
+        - ckan
