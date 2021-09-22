@@ -38,7 +38,7 @@ After installation process has finished, CKAN Vagrant Box will be running at
 ## Box source structure & files
 * *Vagrant box configuration file*: [Vagrantfile](./Vagrantfile)  
 * *Ansible invetory file* for the Vagrant box: [host_vagrant.yml](./host_vagrant.yml)
-* *Ansible configuration *file: [ansible.cfg](./ansible.cfg)
+* *Ansible configuration* file: [ansible.cfg](./ansible.cfg)
 * *Ansible entry playbook*: [ansible/playbook.yml](./ansible/playbook.yml)
 * *Ansible roles* directory: [ansible/roles](./ansible/roles)
     * *Ansible 00_utils role main task*: [ansible/roles/01_utils/tasks/main.yml](./ansible/roles/01_utils/tasks/main.yml)
