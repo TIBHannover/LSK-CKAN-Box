@@ -187,3 +187,48 @@
   until: _result.status == 200
   retries: 10 # 10 * 1 seconds
   delay: 1 # Every 1 second
+
+# CKAN db
+- name: 23 CKAN db init
+  command: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini db init'
+  register: dbinit
+  failed_when: "'Initialising DB: SUCCESS' not in dbinit.stdout"
+
+# supervisor
+- name: Copy wsgi.py to ckan_config_dir
+  copy:
+    src: '{{ ckan_app_dir }}/src/ckan/wsgi.py'
+    dest: '{{ ckan_config_dir }}/wsgi.py'
+    remote_src: yes
+
+- name: pip install uwsgi
+  pip:
+    name: 'uwsgi'
+    virtualenv: '{{ ckan_app_dir }}'
+    virtualenv_python: 'python3.7'
+    state: present
+
+- name: copy ckan-uwsgi.ini to ckan_config_dir
+  copy:
+    src: '{{ ckan_app_dir }}/src/ckan/ckan-uwsgi.ini'
+    dest: '{{ ckan_config_dir }}/ckan-uwsgi.ini'
+    remote_src: yes
+
+- name: ckan-uwsgi.conf
+  template:
+    src: ckan-uwsgi.conf
+    dest: /etc/supervisor/conf.d/ckan-uwsgi.conf
+    mode: og+wr
+    owner: root
+    group: root
+
+# supervisor restart has to be here. and not in notify (notify does not wait for process completion)
+- name: restart_supervisor
+  service:
+    name: supervisor
+    state: reloaded
+
+
+
+
+# TODO: setup nginx
