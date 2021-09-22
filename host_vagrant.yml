@@ -14,15 +14,28 @@ all:
         ansible_sudo_password: 'vagrant'
         ansible_ssh_private_key_file: '~/.vagrant.d/insecure_private_key'
         ansible_python_interpreter: '/usr/bin/python3'
-        vm_url: '192.168.100.101'
+        vm_url: 'http://192.168.100.101'
         # CKAN VARS
         ckan_site_id: 'default'
+        ckan_port: '8080'
+        ckan_site_title: 'CKAN in a Box' # overwrite in deployment
+        ckan_site_description: 'Description of CKAN instance' # overwrite in deployment
+        ckan_site_intro_text: 'Intro on CKAN instance' # overwrite in deployment
+        ckan_site_about: 'About CKAN instance' # overwrite in deployment
+        ckan_frontpage_img_url: 'https://docs.ckan.org/en/2.9/_static/ckanlogo.png'
+        ckan_site_logo: '/base/images/ckan-logo.png'
         ckan_app_dir: '/usr/lib/ckan/{{ ckan_site_id }}'
         ckan_config_dir: '/etc/ckan/{{ ckan_site_id }}'
+        ckan_storage_dir: '/var/opt/ckan'  # overwrite in deployment
         ckan_log_dir: '/var/log/ckan'
+        ckan_url_path: '/ckan'  # overwrite in deployment
         ckan_db: 'ckan'
         ckan_db_user: 'ckan_db_user'  # overwrite in deployment
         ckan_db_pwd: 'ckandbpassword'  # overwrite in deployment
+        ckan_max_resource_size: '200'  # overwrite in deployment
+        ckan_max_image_size: '10'  # overwrite in deployment
+        solr_port: '8983'
+        solr_url: 'http://localhost:8983/solr'
         datastore_db: 'datastore_db'
         datastore_db_user: 'datastore_db_user'  # overwrite in deployment
 

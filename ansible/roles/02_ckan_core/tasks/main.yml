@@ -65,4 +65,88 @@
     state: present
     priv: ALL
 
-#
+# ckan config
+- name: 09 create CKAN dirs
+  file:
+    path: '{{ item }}'
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+    mode: 'a+rw'
+  with_items:
+    - '{{ ckan_config_dir }}'
+    - '{{ ckan_storage_dir }}'
+    - '{{ ckan_storage_dir }}/webassets'
+    - '{{ ckan_log_dir }}'
+
+- name: 10 Generate CKAN config file
+  command: '{{ ckan_app_dir }}/bin/ckan generate config {{ ckan_config_dir }}/ckan.ini'
+
+- name: 11 Edit CKAN config file app:main section
+  community.general.ini_file:
+    path: '{{ ckan_config_dir }}/ckan.ini'
+    section: 'app:main'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'  #postgresql://{{ckan_db_user}}:{{ckan_db_pwd}}@localhost/{{ckan_db}}
+    backup: no
+  with_dict: {
+  sqlalchemy.url: 'postgresql://{{ckan_db_user}}:{{ckan_db_pwd}}@localhost/{{ckan_db}}',
+  ckan.site_url: '{{ vm_url }}',
+  ckan.root_path: '{{ ckan_url_path }}',
+  ckan.site_id: '{{ ckan_site_id }}',
+  ckan.storage_path: '{{ ckan_storage_dir }}',
+  ckan.max_resource_size: '{{ ckan_max_resource_size }}',
+  ckan.max_image_size: '{{ ckan_max_image_size }}',
+  ckan.resource_proxy.chunk_size: '8192',
+  ckan.resource_proxy.max_file_size: '5000000',
+  ckan.webassets.path: '{{ ckan_storage_dir }}/webassets',
+  ckan.site_title: '{{ ckan_site_title }}',
+  ckan.site_description: '{{ ckan_site_description }}',
+  ckan.site_intro_text: '{{ ckan_site_intro_text }}',
+  ckan.site_logo: '{{ ckan_site_logo }}',
+  ckan.site_about: '{{ ckan_site_about }}',
+  solr_url: '{{ solr_url }}'
+  }
+
+- name: 12 Edit CKAN config file server:main section
+  community.general.ini_file:
+    path: '{{ ckan_config_dir }}/ckan.ini'
+    section: 'server:main'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'
+    backup: no
+  with_dict: {
+  port: '{{ ckan_port }}'
+  }
+
+- name: 13 Link ckan who.ini
+  file:
+    src: '{{ ckan_app_dir }}/src/ckan/who.ini'
+    dest: '{{ ckan_config_dir }}/who.ini'
+    state: link
+  notify: ckan_tmp_dir_writable
+
+- name: 14 Add root_path who.ini post_login_url & post_logout_url
+  community.general.ini_file:
+    path: '{{ ckan_app_dir }}/src/ckan/who.ini'
+    section: 'plugin:friendlyform'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'
+    backup: no
+  with_dict: {
+  post_login_url: '{{ ckan_url_path }}/user/logged_in',
+  post_logout_url: '{{ ckan_url_path }}/user/logged_out'
+  }
+
+- name: 15 Set ckan promoted image
+  get_url:
+    url: '{{ ckan_frontpage_img_url }}'
+    dest: '{{ ckan_app_dir }}/src/ckan/ckan/public/base/images/placeholder-420x220.png'
+    mode: 'a+rw'
+
+- name: 16 Replace "This is a featured section"
+  replace:
+    path: '{{ ckan_app_dir }}/src/ckan/ckan/templates/home/snippets/promoted.html'
+    regexp: '"This is a featured section"'
+    replace: '""' # breaks if is empty
