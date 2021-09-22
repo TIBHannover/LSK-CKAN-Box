@@ -42,6 +42,7 @@
     - default-jdk
     - postgresql
     - postfix
+    - supervisor
 
 - name: 4 which pip3 executable
   command: which pip3
