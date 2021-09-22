@@ -229,6 +229,6 @@
     state: reloaded
 
 
-
-
 # TODO: setup nginx
+
+# Data store/ data pusher/ dcat  extensions to 03_ckan_extensions role
