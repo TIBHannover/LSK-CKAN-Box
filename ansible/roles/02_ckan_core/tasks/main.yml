@@ -22,7 +22,7 @@
 
 - name: 04 install ckan
   pip:
-    name: 'git+https://github.com/ckan/ckan.git@ckan-2.9.4#egg=ckan[requirements]'
+    name: 'git+https://github.com/ckan/ckan.git@ckan-2.9.0#egg=ckan[requirements]'
     virtualenv: '{{ ckan_app_dir }}'
     virtualenv_python: python3.7
     editable: yes   # --editable <path/url>   Install a project in editable mode

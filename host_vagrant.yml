@@ -38,4 +38,18 @@ all:
         solr_url: 'http://localhost:8983/solr'
         datastore_db: 'datastore_db'
         datastore_db_user: 'datastore_db_user'  # overwrite in deployment
+        datapusher_jobs_db: 'datapusher_jobs'
+        datapusher_jobs_db_user: 'datapusher_jobs'
+        datapusher_dir: '/usr/lib/ckan/datapusher'
+        datapusher_release: '0.0.17'
+        datapusher_port: '8800'
+        datapusher_intern_url: 'http://127.0.0.1:{{ datapusher_port }}/'
+        datapusher_url_path: '/datapusher'
+
+        ckan_plugins:
+          - stats
+          - text_view
+          - image_view
+          - recline_view
+          - resource_proxy
 

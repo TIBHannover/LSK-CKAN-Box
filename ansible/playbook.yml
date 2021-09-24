@@ -7,3 +7,7 @@
     - role: 02_ckan_core
       tags:
         - ckan
+    - role: 03_ckan_extensions
+      tags:
+        - extensions
+        - data_pusher_store
