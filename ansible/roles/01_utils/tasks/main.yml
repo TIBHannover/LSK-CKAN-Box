@@ -48,6 +48,14 @@
   command: which pip3
   register: pip3_path
 
+
+- name: 5 locale-gen — generates localisation files from templates
+  command: locale-gen
+
+- name: 6 update locale LANG
+  command:  update-locale LANG=en_US.utf8
+# update-locale LANG=en_US.utf8
+
 # - name: 5 Install Python libraries
 #   pip:
 #     name: "{{ item }}"

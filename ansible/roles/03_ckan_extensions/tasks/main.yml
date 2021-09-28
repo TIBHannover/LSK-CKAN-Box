@@ -69,6 +69,8 @@
   delay: 1 # Every 1 second
 
 # Datapusher extension
+# update-locale LANG=en_US.utf8 needed see if it is in ansible/roles/01_utils/tasks/main.yml
+
 - name: Install datapusher packages
   package:
     name: "{{ item }}"
