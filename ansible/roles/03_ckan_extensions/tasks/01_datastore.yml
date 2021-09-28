@@ -1,6 +1,6 @@
 ---
 # Datastore extension
-- name: Postgres datastore user
+- name: ext datastore 01 - Postgres datastore user
   become_user: postgres
   become: yes
   postgresql_user:
@@ -8,14 +8,14 @@
     password: '{{ ckan_db_pwd }}'
     expires: 'infinity'
 
-- name:  Postgres datastore db
+- name: ext datastore 02 - Postgres datastore db
   become: yes
   become_user: postgres
   postgresql_db:
     name: '{{ datastore_db }}'
     encoding: UTF-8
 
-- name: Postgres user rights in datastore db
+- name: ext datastore 03 - Postgres user rights in datastore db
   become: yes
   become_user: postgres
   postgresql_user:
@@ -25,17 +25,13 @@
     state: present
     priv: ALL
 
-- name: Append datastore to ckanplugins list
+- name: ext datastore 04 - Append datastore to ckanplugins list
   set_fact:
    ckan_plugins: "{{ ckan_plugins + [item] }}"
   with_items:
    - "datastore"
 
-- name: Print plugins
-  debug:
-    msg: "Plugins: {{ ckan_plugins| join(' ') }}"
-
-- name: update ckan.ini with datastore settings
+- name: ext datastore 05 - update ckan.ini with datastore settings
   community.general.ini_file:
     path: '{{ ckan_config_dir }}/ckan.ini'
     section: 'app:main'
@@ -48,17 +44,17 @@
     ckan.datastore.read_url: 'postgresql://{{datastore_db_user}}:{{ckan_db_pwd}}@localhost/{{datastore_db}}'
   }
 
-- name: datastore db init
+- name: ext datastore 06 - datastore db init
   shell: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini datastore set-permissions | sudo -u postgres psql --set ON_ERROR_STOP=1'
   notify: reload_webserver
 
 # supervisor restart has to be here. and not in notify (notify does not wait for process completion)
-- name: restart_supervisor
+- name: ext datastore 07 - restart_supervisor
   service:
     name: supervisor
     state: reloaded
 
-- name: test datastore GET
+- name: ext datastore 08 - test datastore GET
   uri:
     url: 'http://127.0.0.1:{{ ckan_port }}/api/3/action/datastore_search?resource_id=_table_metadata'
     remote_src: yes

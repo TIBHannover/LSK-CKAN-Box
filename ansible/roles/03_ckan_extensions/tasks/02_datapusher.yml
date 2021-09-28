@@ -2,7 +2,7 @@
 # Datapusher extension
 # update-locale LANG=en_US.utf8 needed see if it is in ansible/roles/01_utils/tasks/main.yml
 
-- name: Install datapusher packages
+- name: ext datapusher 01 - Install datapusher packages
   package:
     name: "{{ item }}"
     state: present
@@ -12,7 +12,7 @@
     - libxml2-dev
     - libffi-dev
 
-- name: Postgres datapusher_jobs user
+- name: ext datapusher 02 - Postgres datapusher_jobs user
   become_user: postgres
   become: yes
   postgresql_user:
@@ -20,14 +20,14 @@
     password: '{{ ckan_db_pwd }}'
     expires: 'infinity'
 
-- name:  Postgres datapusher_jobs db
+- name: ext datapusher 03 - Postgres datapusher_jobs db
   become: yes
   become_user: postgres
   postgresql_db:
     name: '{{ datapusher_jobs_db }}'
     encoding: UTF-8
 
-- name: Postgres user rights in datapusher_jobs db
+- name: ext datapusher 04 - Postgres user rights in datapusher_jobs db
   become: yes
   become_user: postgres
   postgresql_user:
@@ -37,7 +37,7 @@
     state: present
     priv: ALL
 
-- name: create datapusher dir
+- name: ext datapusher 05 - create datapusher dir
   file:
     path: '{{ datapusher_dir }}/src'
     mode: ug+rwx
@@ -45,7 +45,7 @@
     group: root
     state: directory
 
-- name: pip install uwsgi in datapusher_dir
+- name: ext datapusher 06 - pip install uwsgi in datapusher_dir
   pip:
     name: '{{ item }}'
     virtualenv: '{{ datapusher_dir }}'
@@ -55,34 +55,30 @@
     - 'uwsgi'
     - 'psycopg2'
 
-- name: git clone datapusher
+- name: ext datapusher 07 - git clone datapusher
   git:
     repo: 'https://github.com/ckan/datapusher.git'
     dest: '{{ datapusher_dir }}/src/datapusher'
     version: '{{ datapusher_release }}'
     force: yes
 
-- name: pip install datapusher_dir requirements
+- name: ext datapusher 08 - pip install datapusher_dir requirements
   pip:
     requirements: '{{ datapusher_dir }}/src/datapusher/requirements.txt'
     virtualenv: '{{ datapusher_dir }}'
     virtualenv_python: 'python3.7'
     state: present
 
-- name: install datapusher
+- name: ext datapusher 09 - install datapusher
   command: '{{ datapusher_dir }}/bin/python {{ datapusher_dir }}/src/datapusher/setup.py develop'
 
-- name: Append datapusher to ckanplugins list
+- name: ext datapusher 10 - Append datapusher to ckanplugins list
   set_fact:
    ckan_plugins: "{{ ckan_plugins + [item] }}"
   with_items:
    - "datapusher"
 
-- name: Print plugins
-  debug:
-    msg: "Plugins: {{ ckan_plugins| join(' ') }}"
-
-- name: update ckan.ini with datapusher settings
+- name: ext datapusher 11 -  update ckan.ini with datapusher settings
   community.general.ini_file:
     path: '{{ ckan_config_dir }}/ckan.ini'
     section: 'app:main'
@@ -96,7 +92,7 @@
     ckan.datapusher.assume_task_stale_after: '3600'
   }
 
-- name: datapusher-uwsgi.conf
+- name: ext datapusher 12 - datapusher-uwsgi.conf
   template:
     src: datapusher-uwsgi.conf
     dest: /etc/supervisor/conf.d/datapusher-uwsgi.conf
@@ -104,7 +100,7 @@
     owner: root
     group: root
 
-- name: Template deployment/datapusher_settings.py
+- name: ext datapusher 13 - Template deployment/datapusher_settings.py
   template:
     src: datapusher_settings.py.j2
     dest: '{{datapusher_dir}}/src/datapusher/deployment/datapusher_settings.py'
@@ -112,7 +108,7 @@
     owner: root
     group: root
 
-- name: Edit deployment/datapusher-uwsgi.ini
+- name: ext datapusher 14 - Edit deployment/datapusher-uwsgi.ini
   community.general.ini_file:
     path: '{{datapusher_dir}}/src/datapusher/deployment/datapusher-uwsgi.ini'
     section: 'uwsgi'
@@ -125,17 +121,17 @@
   lazy-apps: 'true'
   }
 
-- name: restart supervisor
+- name: ext datapusher 15 - restart supervisor
   service:
     name: supervisor
     state: reloaded
 
-- name: restart webserver
+- name: ext datapusher 16 - restart webserver
   service:
     name: 'nginx'
     state: reloaded
 
-- name: test datapusher GET
+- name: ext datapusher 17 - test datapusher GET
   uri:
     url: '{{ datapusher_intern_url }}'
     remote_src: yes
