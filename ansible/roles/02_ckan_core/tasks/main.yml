@@ -228,6 +228,14 @@
     name: supervisor
     state: reloaded
 
+- name: test ckan core GET
+  uri:
+    url: '{{ ckan_intern_url}}'
+    remote_src: yes
+  register: _result
+  until: _result.status == 200
+  retries: 10 # 10 * 1 seconds
+  delay: 1 # Every 1 second
 
 # TODO: setup nginx
 

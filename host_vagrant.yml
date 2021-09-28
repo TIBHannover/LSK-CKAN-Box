@@ -18,6 +18,7 @@ all:
         # CKAN VARS
         ckan_site_id: 'default'
         ckan_port: '8080'
+        ckan_intern_url: 'http://127.0.0.1:{{ ckan_port }}'
         ckan_site_title: 'CKAN in a Box' # overwrite in deployment
         ckan_site_description: 'Description of CKAN instance' # overwrite in deployment
         ckan_site_intro_text: 'Intro on CKAN instance' # overwrite in deployment
