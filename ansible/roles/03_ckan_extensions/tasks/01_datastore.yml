@@ -1,0 +1,68 @@
+---
+# Datastore extension
+- name: Postgres datastore user
+  become_user: postgres
+  become: yes
+  postgresql_user:
+    name: '{{ datastore_db_user }}'
+    password: '{{ ckan_db_pwd }}'
+    expires: 'infinity'
+
+- name:  Postgres datastore db
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: '{{ datastore_db }}'
+    encoding: UTF-8
+
+- name: Postgres user rights in datastore db
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: '{{ ckan_db_user }}'
+    db: '{{ datastore_db }}'
+    expires: 'infinity'
+    state: present
+    priv: ALL
+
+- name: Append datastore to ckanplugins list
+  set_fact:
+   ckan_plugins: "{{ ckan_plugins + [item] }}"
+  with_items:
+   - "datastore"
+
+- name: Print plugins
+  debug:
+    msg: "Plugins: {{ ckan_plugins| join(' ') }}"
+
+- name: update ckan.ini with datastore settings
+  community.general.ini_file:
+    path: '{{ ckan_config_dir }}/ckan.ini'
+    section: 'app:main'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'  #postgresql://{{ckan_db_user}}:{{ckan_db_pwd}}@localhost/{{ckan_db}}
+    backup: no
+  with_dict: {
+    ckan.plugins: '{{ ckan_plugins| join(" ") }}',
+    ckan.datastore.write_url: 'postgresql://{{ckan_db_user}}:{{ckan_db_pwd}}@localhost/{{datastore_db}}',
+    ckan.datastore.read_url: 'postgresql://{{datastore_db_user}}:{{ckan_db_pwd}}@localhost/{{datastore_db}}'
+  }
+
+- name: datastore db init
+  shell: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini datastore set-permissions | sudo -u postgres psql --set ON_ERROR_STOP=1'
+  notify: reload_webserver
+
+# supervisor restart has to be here. and not in notify (notify does not wait for process completion)
+- name: restart_supervisor
+  service:
+    name: supervisor
+    state: reloaded
+
+- name: test datastore GET
+  uri:
+    url: 'http://127.0.0.1:{{ ckan_port }}/api/3/action/datastore_search?resource_id=_table_metadata'
+    remote_src: yes
+  register: _result
+  until: _result.status == 200
+  retries: 10 # 10 * 1 seconds
+  delay: 1 # Every 1 second

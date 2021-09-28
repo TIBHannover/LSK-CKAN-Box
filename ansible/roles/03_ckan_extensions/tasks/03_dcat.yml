@@ -1,0 +1,46 @@
+---
+# dcat extension
+
+- name: ext dcat 01 - pip install ckanext-dcat
+  pip:
+    name: 'git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext-dcat'
+    virtualenv: '{{ ckan_app_dir }}'
+    virtualenv_python: python3.7
+    editable: yes   # --editable <path/url>   Install a project in editable mode
+    state: present
+
+- name: ext dcat 02 - pip install ckanext-dcat requirements
+  pip:
+    requirements: '{{ ckan_app_dir }}/src/ckanext-dcat/requirements.txt'
+    virtualenv: '{{ ckan_app_dir }}'
+    virtualenv_python: 'python3.7'
+    state: present
+
+- name: ext dcat 03 -Append ckanext-dcat to ckanplugins list
+  set_fact:
+   ckan_plugins: "{{ ckan_plugins + [item] }}"
+  with_items:
+   - "dcat"
+   - "structured_data"
+
+- name: ext dcat 04 - update ckan.ini with ckanext-dcat settings
+  community.general.ini_file:
+    path: '{{ ckan_config_dir }}/ckan.ini'
+    section: 'app:main'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}' 
+    backup: no
+  with_dict: {
+    ckan.plugins: '{{ ckan_plugins | join(" ")}}',
+    'ckanext.dcat.enable_content_negotiation': 'True'
+    }
+
+- name: ext dcat 05 - restart supervisor
+  service:
+    name: supervisor
+    state: reloaded
+
+- name: ext dcat 06 - restart webserver
+  service:
+    name: 'nginx'
+    state: restarted

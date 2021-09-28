@@ -1,0 +1,145 @@
+---
+# Datapusher extension
+# update-locale LANG=en_US.utf8 needed see if it is in ansible/roles/01_utils/tasks/main.yml
+
+- name: Install datapusher packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - build-essential
+    - libxslt1-dev
+    - libxml2-dev
+    - libffi-dev
+
+- name: Postgres datapusher_jobs user
+  become_user: postgres
+  become: yes
+  postgresql_user:
+    name: '{{ datapusher_jobs_db_user }}'
+    password: '{{ ckan_db_pwd }}'
+    expires: 'infinity'
+
+- name:  Postgres datapusher_jobs db
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: '{{ datapusher_jobs_db }}'
+    encoding: UTF-8
+
+- name: Postgres user rights in datapusher_jobs db
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: '{{ datapusher_jobs_db_user }}'
+    db: '{{ datapusher_jobs_db }}'
+    expires: 'infinity'
+    state: present
+    priv: ALL
+
+- name: create datapusher dir
+  file:
+    path: '{{ datapusher_dir }}/src'
+    mode: ug+rwx
+    owner: root
+    group: root
+    state: directory
+
+- name: pip install uwsgi in datapusher_dir
+  pip:
+    name: '{{ item }}'
+    virtualenv: '{{ datapusher_dir }}'
+    virtualenv_python: 'python3.7'
+    state: present
+  loop:
+    - 'uwsgi'
+    - 'psycopg2'
+
+- name: git clone datapusher
+  git:
+    repo: 'https://github.com/ckan/datapusher.git'
+    dest: '{{ datapusher_dir }}/src/datapusher'
+    version: '{{ datapusher_release }}'
+    force: yes
+
+- name: pip install datapusher_dir requirements
+  pip:
+    requirements: '{{ datapusher_dir }}/src/datapusher/requirements.txt'
+    virtualenv: '{{ datapusher_dir }}'
+    virtualenv_python: 'python3.7'
+    state: present
+
+- name: install datapusher
+  command: '{{ datapusher_dir }}/bin/python {{ datapusher_dir }}/src/datapusher/setup.py develop'
+
+- name: Append datapusher to ckanplugins list
+  set_fact:
+   ckan_plugins: "{{ ckan_plugins + [item] }}"
+  with_items:
+   - "datapusher"
+
+- name: Print plugins
+  debug:
+    msg: "Plugins: {{ ckan_plugins| join(' ') }}"
+
+- name: update ckan.ini with datapusher settings
+  community.general.ini_file:
+    path: '{{ ckan_config_dir }}/ckan.ini'
+    section: 'app:main'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'  #postgresql://{{ckan_db_user}}:{{ckan_db_pwd}}@localhost/{{ckan_db}}
+    backup: no
+  with_dict: {
+    ckan.plugins: '{{ ckan_plugins | join(" ")}}',
+    ckan.datapusher.formats: 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ckan.datapusher.url: '{{ datapusher_intern_url }}',
+    ckan.datapusher.assume_task_stale_after: '3600'
+  }
+
+- name: datapusher-uwsgi.conf
+  template:
+    src: datapusher-uwsgi.conf
+    dest: /etc/supervisor/conf.d/datapusher-uwsgi.conf
+    mode: og+wr
+    owner: root
+    group: root
+
+- name: Template deployment/datapusher_settings.py
+  template:
+    src: datapusher_settings.py.j2
+    dest: '{{datapusher_dir}}/src/datapusher/deployment/datapusher_settings.py'
+    mode: og+wr
+    owner: root
+    group: root
+
+- name: Edit deployment/datapusher-uwsgi.ini
+  community.general.ini_file:
+    path: '{{datapusher_dir}}/src/datapusher/deployment/datapusher-uwsgi.ini'
+    section: 'uwsgi'
+    option: '{{ item.key }}'
+    value: '{{ item.value }}'
+    backup: no
+  with_dict: {
+  workers: '3',
+  threads: '3',
+  lazy-apps: 'true'
+  }
+
+- name: restart supervisor
+  service:
+    name: supervisor
+    state: reloaded
+
+- name: restart webserver
+  service:
+    name: 'nginx'
+    state: reloaded
+
+- name: test datapusher GET
+  uri:
+    url: '{{ datapusher_intern_url }}'
+    remote_src: yes
+  register: _result
+  until: _result.status == 200
+  retries: 10 # 10 * 1 seconds
+  delay: 1 # Every 1 second
