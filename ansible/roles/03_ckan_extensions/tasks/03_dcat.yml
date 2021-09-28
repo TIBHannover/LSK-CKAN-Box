@@ -44,3 +44,6 @@
   service:
     name: 'nginx'
     state: restarted
+
+
+# chown www-data:www-data /usr/lib/ckan/default/src/ckan/ckan/public/base/i18n/*.js    

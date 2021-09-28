@@ -7,3 +7,12 @@
 
 - name: 03 Install dcat extension
   import_tasks: 03_dcat.yml
+
+- name: test CKAN GET
+  uri:
+    url: '{{ ckan_intern_url }}'
+    remote_src: yes
+  register: _result
+  until: _result.status == 200
+  retries: 10 # 10 * 1 seconds
+  delay: 1 # Every 1 second
