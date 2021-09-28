@@ -48,13 +48,17 @@
   command: which pip3
   register: pip3_path
 
+- name: 5 en_US.UTF-8 UTF-8 in /etc/locale.gen
+  lineinfile:
+    path: /etc/locale.gen
+    regexp: '^#\sen_US\.UTF-8\sUTF-8'
+    line: en_US.UTF-8 UTF-8
 
-- name: 5 locale-gen — generates localisation files from templates
-  command: locale-gen
+- name: 6 reconfigure locales
+  command: dpkg-reconfigure locales -f noninteractive 
 
-- name: 6 update locale LANG
+- name: 7 update locale LANG
   command:  update-locale LANG=en_US.utf8
-# update-locale LANG=en_US.utf8
 
 # - name: 5 Install Python libraries
 #   pip:
