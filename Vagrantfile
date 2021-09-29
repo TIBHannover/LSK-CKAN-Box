@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "ansible/playbook.yml"
       ansible.inventory_path = "host_vagrant.yml"
       ansible.galaxy_role_file = "ansible/requirements.yml"
-      ansible.verbose = true
+      ansible.verbose = false
       ansible.config_file = "ansible/ansible.cfg"
       ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
       # ansible.start_at_task = "add custome name to redis service in docker-compose.yml"

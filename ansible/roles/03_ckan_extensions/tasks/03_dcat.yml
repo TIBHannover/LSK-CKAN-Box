@@ -39,7 +39,8 @@
   service:
     name: supervisor
     state: reloaded
-
+  notify: ckan_tmp_dir_writable
+  
 - name: ext dcat 06 - restart webserver
   service:
     name: 'nginx'

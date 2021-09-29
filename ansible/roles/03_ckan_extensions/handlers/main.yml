@@ -20,3 +20,11 @@
     mode: 'a+rw'
     recurse: yes
     state: directory
+
+- name: ckan_tmp_dir_writable
+  file:
+    path: '{{ ckan_app_dir }}/src/ckan/ckan/public/base/i18n/'
+    owner: 'www-data'
+    group: 'www-data'
+    recurse: yes
+    state: directory
