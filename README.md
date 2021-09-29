@@ -18,7 +18,7 @@ Installed CKAN extensions:
 
 Run the following steps in Terminal (Linux/macOS) or Git Bash (Windows):
 ```bash
-cd ckanbox
+cd ckan-box
 vagrant up
 ```
 
