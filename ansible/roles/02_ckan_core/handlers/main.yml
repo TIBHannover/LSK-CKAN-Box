@@ -11,7 +11,14 @@
 
 - name: ckan_tmp_dir_writable
   file:
-    path: '/tmp/{{ ckan_site_id }}'
-    mode: 'a+rw'
+    path: '/tmp/'
+    mode: '666' # all r+w
+    recurse: yes
+    state: directory
+
+- name: ckan_dir_webassets_writable
+  file:
+    path: '/tmp/'
+    mode: '666' # all r+w
     recurse: yes
     state: directory

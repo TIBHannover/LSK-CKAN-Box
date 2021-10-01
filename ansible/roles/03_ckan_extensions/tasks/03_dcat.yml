@@ -22,6 +22,13 @@
   with_items:
    - "dcat"
    - "structured_data"
+   - "dcat"
+   - "dcat_rdf_harvester"
+   - "dcat_json_harvester"
+   - "dcat_json_interface"
+   - "structured_data"
+# BUG: once plugins are enabled CKAN is no longer up
+
 
 - name: ext dcat 04 - update ckan.ini with ckanext-dcat settings
   community.general.ini_file:
@@ -39,12 +46,14 @@
   service:
     name: supervisor
     state: reloaded
-  notify: ckan_tmp_dir_writable
-  
-- name: ext dcat 06 - restart webserver
-  service:
-    name: 'nginx'
-    state: restarted
+  notify: 
+    - ckan_tmp_dir_writable
+    - ckan_dir_webassets_writable
+
+# - name: ext dcat 06 - restart webserver
+#   service:
+#     name: 'nginx'
+#     state: restarted
 
 
 # chown www-data:www-data /usr/lib/ckan/default/src/ckan/ckan/public/base/i18n/*.js    
