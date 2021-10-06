@@ -11,3 +11,6 @@
       tags:
         - extensions
         - data_pusher_store
+    - role: 04_nginx
+      tags:
+        - nginx

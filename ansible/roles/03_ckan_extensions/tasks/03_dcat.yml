@@ -22,11 +22,7 @@
   with_items:
    - "dcat"
    - "structured_data"
-   - "dcat"
-   - "dcat_rdf_harvester"
-   - "dcat_json_harvester"
    - "dcat_json_interface"
-   - "structured_data"
 # BUG: once plugins are enabled CKAN is no longer up
 
 

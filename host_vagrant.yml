@@ -46,11 +46,10 @@ all:
         datapusher_port: '8800'
         datapusher_intern_url: 'http://127.0.0.1:{{ datapusher_port }}/'
         datapusher_url_path: '/datapusher'
-
         ckan_plugins:
           - stats
           - text_view
           - image_view
           - recline_view
           - resource_proxy
-
+        nginx_ckan_conf: 'includes/ckan.conf'
