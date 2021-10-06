@@ -60,5 +60,6 @@ In [host_vagrant.yml](./host_vagrant.yml) the following variables are defined an
 * *Ansible roles/collections requirements*: [ansible/requirements.yml](./ansible/requirements.yml)
 
 # TODO
-* enable and datapusher and harvester
-* enable DCAT
+* enable and datapusher and 
+* enable DCAT harvester
+* on [ansible/roles/02_ckan_core/tasks/main.yml](./ansible/roles/02_ckan_core/tasks/main.yml) run - `25.1  CKAN test dataset - vocabs` and `25.2  CKAN test dataset - gov data` only on vagrant box

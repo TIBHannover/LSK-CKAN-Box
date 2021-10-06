@@ -11,6 +11,7 @@
       tags:
         - extensions
         - data_pusher_store
+        - dcat
     - role: 04_nginx
       tags:
         - nginx

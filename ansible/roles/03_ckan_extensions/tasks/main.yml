@@ -5,8 +5,8 @@
 - name: 02 Install  datapusher extension
   import_tasks: 02_datapusher.yml
 
-# - name: 03 Install dcat extension
-#   import_tasks: 03_dcat.yml
+- name: 03 Install dcat extension
+  import_tasks: 03_dcat.yml
 
 - name: test CKAN GET
   uri:

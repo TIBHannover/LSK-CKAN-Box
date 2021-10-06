@@ -1,6 +1,21 @@
 ---
 # dcat extension
 
+- name: pip install ckanext-harvest
+  pip:
+    name: 'git+https://github.com/ckan/ckanext-harvest.git#egg=ckanext-harvest'
+    virtualenv: '{{ ckan_app_dir }}'
+    virtualenv_python: python3.7
+    editable: yes   # --editable <path/url>   Install a project in editable mode
+    state: present
+
+- name: pip install ckanext-harvest requirements
+  pip:
+    requirements: '{{ ckan_app_dir }}/src/ckanext-harvest/pip-requirements.txt'
+    virtualenv: '{{ ckan_app_dir }}'
+    virtualenv_python: 'python3.7'
+    state: present
+
 - name: ext dcat 01 - pip install ckanext-dcat
   pip:
     name: 'git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext-dcat'
@@ -20,11 +35,13 @@
   set_fact:
    ckan_plugins: "{{ ckan_plugins + [item] }}"
   with_items:
+   - "harvest"
+   - "ckan_harvester"
    - "dcat"
-   - "structured_data"
+   - "dcat_rdf_harvester"
+   - "dcat_json_harvester"
    - "dcat_json_interface"
-# BUG: once plugins are enabled CKAN is no longer up
-
+   - "structured_data"
 
 - name: ext dcat 04 - update ckan.ini with ckanext-dcat settings
   community.general.ini_file:
@@ -38,6 +55,20 @@
     'ckanext.dcat.enable_content_negotiation': 'True'
     }
 
+
+- name: Create the harvester tables db
+  command: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini harvester initdb'
+  register: dbtablescreate
+  failed_when: "'DB tables created' not in dbtablescreate.stdout"
+
+- name: ckan_harvesting.conf supervisor template
+  template:
+    src: ckan_harvesting.conf
+    dest: /etc/supervisor/conf.d/ckan_harvesting.conf
+    mode: og+wr
+    owner: root
+    group: root
+
 - name: ext dcat 05 - restart supervisor
   service:
     name: supervisor
@@ -45,6 +76,14 @@
   notify: 
     - ckan_tmp_dir_writable
     - ckan_dir_webassets_writable
+
+- name: ckan harvester cron # runs at 5AM
+  cron:
+    name: "ckan harvester"
+    hour: "*5"
+    job: '{{ ckan_app_dir }}/bin/ckan  -c {{ ckan_config_dir }}/ckan.ini harvester run > /dev/null'
+  tags: localsettings
+
 
 # - name: ext dcat 06 - restart webserver
 #   service:
