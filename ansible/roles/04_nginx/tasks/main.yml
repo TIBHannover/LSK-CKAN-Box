@@ -1,0 +1,55 @@
+
+---
+- name: 1 create nginx includes dir
+  file:
+    state: directory
+    path: /etc/nginx/includes/
+    mode: og+wr
+    owner: root
+    group: root
+
+- name: 2 NGINX ckan includes config
+  template:
+    src: nginx_ckan.j2
+    dest: '/etc/nginx/{{ nginx_ckan_conf }}'
+    mode: og+wr
+    owner: root
+    group: root
+
+- name: 3 remove comments from NGINX site default
+  lineinfile:
+    path: /etc/nginx/sites-available/default
+    regexp: '#\s*?.*$'
+    state: absent
+
+- name: 4.1 insert ckan conf to NGINX site default
+  lineinfile:
+    path: /etc/nginx/sites-available/default
+    insertafter: 'server_name _;'
+    line: '        include {{ nginx_ckan_conf }};'
+
+- name: 4.2 insert proxy_cache settings at top of NGINX site default conf
+  blockinfile:
+    path: /etc/nginx/sites-available/default
+    insertbefore: 'server {'
+    block: |
+      proxy_cache_path /tmp/nginx_cache levels=1:2 keys_zone=cache:30m max_size=250m;
+      proxy_temp_path /tmp/nginx_proxy 1 2;
+    mode: og+wr
+    owner: root
+    group: root
+
+- name: 5 enable NGINX default config
+  file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  notify: reload_webserver
+
+- name: 6 reload NGINX
+  command: systemctl reload nginx
+
+- name: 7 print location
+  debug:
+    msg: "ckan at {{ vm_url }}{{ ckan_url_path }}"
+
