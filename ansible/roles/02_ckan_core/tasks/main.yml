@@ -194,6 +194,21 @@
   register: dbinit
   failed_when: "'Initialising DB: SUCCESS' not in dbinit.stdout"
 
+- name: 24.1 CKAN create admin user
+  command: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini user add {{ ckan_admin_user}} email={{ ckan_admin_user_email }} password={{ ckan_admin_user_password }}'
+
+- name: 24.2 CKAN admin user become system admin
+  command: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini sysadmin add {{ ckan_admin_user}}'
+
+- name: 25.1  CKAN test dataset - vocabs
+  command: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini seed vocabs'
+
+- name: 25.2  CKAN test dataset - gov data
+  command: '{{ ckan_app_dir }}/bin/ckan -c {{ ckan_config_dir }}/ckan.ini seed gov'
+
+# make adminuser systemdnin
+
+
 # supervisor
 - name: Copy wsgi.py to ckan_config_dir
   copy:

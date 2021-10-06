@@ -23,9 +23,14 @@ vagrant up
 ```
 
 After installation process has finished, CKAN Vagrant Box will be running at 
-<http://192.168.100.101> and **CKAN will be running at <http://192.168.100.101/box/ckan>**
-* CKAN path can be change at [host_vagrant.yml](./host_vagrant.yml) in the variable `ckan_url_path`
+<http://192.168.100.101> and **CKAN will be running at <http://192.168.100.101/box/ckan>** with default **admin user** `admin` and **password** `adminpwd`
 
+In [host_vagrant.yml](./host_vagrant.yml) the following variables are defined and can be changed:
+* `ckan_url_path: '/box/ckan'`
+* `ckan_admin_user: 'admin'`
+* `ckan_admin_user_password: 'adminpwd'`
+* `ckan_admin_user_email: 'admin@mail.com'`
+* `vm_url: 'http://192.168.100.101'`
 
 ## Other Vagrant commands
 
@@ -54,3 +59,6 @@ After installation process has finished, CKAN Vagrant Box will be running at
     * *Ansible 00_utils role main task*: [ansible/roles/01_utils/tasks/main.yml](./ansible/roles/01_utils/tasks/main.yml)
 * *Ansible roles/collections requirements*: [ansible/requirements.yml](./ansible/requirements.yml)
 
+# TODO
+* enable and datapusher and harvester
+* enable DCAT

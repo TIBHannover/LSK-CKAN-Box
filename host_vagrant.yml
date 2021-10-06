@@ -16,6 +16,9 @@ all:
         ansible_python_interpreter: '/usr/bin/python3'
         vm_url: 'http://192.168.100.101'
         # CKAN VARS
+        ckan_admin_user: 'admin'
+        ckan_admin_user_password: 'adminpwd'
+        ckan_admin_user_email: 'admin@mail.com'
         ckan_site_id: 'default'
         ckan_port: '8080'
         ckan_intern_url: 'http://127.0.0.1:{{ ckan_port }}'
