@@ -29,7 +29,7 @@ all:
         ckan_config_dir: '/etc/ckan/{{ ckan_site_id }}'
         ckan_storage_dir: '/var/opt/ckan'  # overwrite in deployment
         ckan_log_dir: '/var/log/ckan'
-        ckan_url_path: '/ckan'  # overwrite in deployment
+        ckan_url_path: '/box/ckan'  # overwrite in deployment
         ckan_db: 'ckan'
         ckan_db_user: 'ckan_db_user'  # overwrite in deployment
         ckan_db_pwd: 'ckandbpassword'  # overwrite in deployment

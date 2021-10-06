@@ -1,6 +1,7 @@
     # ckan
 
     location {{ ckan_url_path }}/ {
+        rewrite ^{{ ckan_url_path }}/(.*) /$1 break;
         proxy_pass {{ ckan_intern_url }};
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header Host $host;

@@ -23,7 +23,12 @@ vagrant up
 ```
 
 After installation process has finished, CKAN Vagrant Box will be running at 
-* 192.168.100.101
+<http://192.168.100.101> and **CKAN will be running at <http://192.168.100.101/box/ckan>**
+* CKAN path can be change at [host_vagrant.yml](./host_vagrant.yml) in the variable `ckan_url_path`
+
+
+## Other Vagrant commands
+
 
 `vagrant up` creates a new Vagrant box and runs the Ansible  playbook
 
