@@ -8,6 +8,16 @@
 - name: 03 Install dcat extension
   import_tasks: 03_dcat.yml
 
+- name: make writable dirs
+  file:
+    path: '{{ item }}'
+    mode: 'a+rw'
+    recurse: yes
+    state: directory
+  loop:
+    - '/tmp'
+    - '/var/opt/ckan/storage/uploads'
+
 - name: test CKAN GET
   uri:
     url: '{{ ckan_intern_url }}'
