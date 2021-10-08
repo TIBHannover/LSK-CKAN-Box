@@ -11,7 +11,7 @@
 - name: make writable dirs
   file:
     path: '{{ item }}'
-    mode: 'a+rw'
+    mode: 'a+rwx'
     recurse: yes
     state: directory
   loop:
