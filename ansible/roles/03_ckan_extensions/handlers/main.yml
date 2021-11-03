@@ -16,8 +16,8 @@
 
 - name: ckan_tmp_dir_writable
   file:
-    path: '/tmp/{{ ckan_site_id }}'
-    mode: 'a+rw'
+    path: '/tmp/'
+    mode: 'u=rwx,g=rwx,o=rwx'
     recurse: yes
     state: directory
 
