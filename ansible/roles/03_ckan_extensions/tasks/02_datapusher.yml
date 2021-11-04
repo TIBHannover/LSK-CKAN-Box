@@ -116,9 +116,9 @@
     value: '{{ item.value }}'
     backup: no
   with_dict: {
-  workers: '3',
-  threads: '3',
-  lazy-apps: 'true'
+    workers: '3',
+    threads: '3',
+    lazy-apps: 'true'
   }
 
 - name: ext datapusher 15 - restart supervisor
